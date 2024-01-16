@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="upload">
+    <update id="insertFile">
+        <![CDATA[
+        INSERT INTO tb_file (
+              id
+            , del_yn
+            , reg_id
+        ) VALUES (
+              #{fileId}::uuid
+            , #{fileDtlYn}
+            , #{fileRegId}
+         );
+
+        INSERT INTO tb_file_dtl (
+              id
+            , parent_id
+            , original_name
+            , mimetype
+            , file_name
+            , destination
+            , path
+            , size
+        ) VALUES (
+              #{fileDtlId}::uuid
+            , #{fileParentId}::uuid
+            , #{fileOriginalName}
+            , #{fileMimeType}
+            , #{fileName}
+            , #{fileDestination}
+            , #{filePath}
+            , #{fileSize}::int
+        )
+        ]]>
+    </update>
+
+    <!-- 파일 상세 정보 조회 (by ids) -->
+    <select id="selectFileDtlByFileDtlId">
+        SELECT tb_file.id AS file_id
+             , tb_file.reg_id AS file_reg_id
+             , tb_file_dtl.id AS file_dtl_id
+             , tb_file_dtl.parent_id AS file_parent_id
+             , tb_file_dtl.original_name AS file_original_name
+             , tb_file_dtl.mimetype AS file_mime_type
+             , tb_file_dtl.file_name AS file_name
+             , tb_file_dtl.destination AS file_destination
+             , tb_file_dtl.path AS file_path
+             , tb_file_dtl.size AS file_size
+          FROM tb_file
+             , tb_file_dtl
+         WHERE tb_file.id IN
+         <foreach collection="fileDtl" item="data" open=" ( " separator=", " close=" ) ">
+             #{data.fileId}
+         </foreach>
+           AND tb_file.del_yn = 'N'
+    </select>
+
+    <!-- 파일 읽기 -->
+    <select id="selectFileReadStream">
+        SELECT tb_file_dtl.path AS file_path
+          FROM tb_file
+             , tb_file_dtl
+         WHERE tb_file.id = #{fileId}
+           AND tb_file.del_yn = 'N'
+    </select>
+</mapper>
+
+
+
+
+
+

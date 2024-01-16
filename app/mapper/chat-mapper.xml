@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="chat">
+    <!-- 채팅 파트너 등록 -->
+    <update id="insertChatPartners">
+        <![CDATA[
+        INSERT INTO tb_chat_partner (
+              target_user_key
+            , name
+            , hobby
+            , personality
+            , job
+            , language
+            , del_yn
+            , profile_file_id
+        ) VALUES (
+              #{targetUserKey}
+            , #{name}
+            , #{hobby}
+            , #{personality}
+            , #{job}
+            , #{language}
+            , 'N'
+            , #{profileFileId}
+        )
+        ]]>
+    </update>
+
+    <!-- 채팅 파트너 조회 -->
+    <select id="selectPartners">
+        <![CDATA[
+        SELECT tb_chat_partner.id AS partner_id
+             , tb_chat_partner.name AS name
+             , tb_chat_partner.hobby AS hobby
+             , tb_chat_partner.personality AS personality
+             , tb_chat_partner.job AS job
+             , tb_chat_partner.language AS language
+             , tb_chat_partner.reg_date AS reg_date
+             , tb_file.id AS file_id
+             , tb_file_dtl.id AS file_dtl_id
+             , tb_file_dtl.original_name AS file_original_name
+             , tb_file_dtl.mimetype AS file_mime_type
+             , tb_file_dtl.file_name AS file_name
+             , tb_file_dtl.path AS file_path
+             , tb_file_dtl.size AS file_size
+        FROM tb_chat_partner
+        LEFT OUTER JOIN tb_file ON tb_chat_partner.profile_file_id = tb_file.id AND tb_file.del_yn = 'N'
+        LEFT OUTER JOIN tb_file_dtl ON tb_file.id = tb_file_dtl.parent_id
+        WHERE target_user_key = #{targetUserKey}
+        ]]>
+    </select>
+
+</mapper>

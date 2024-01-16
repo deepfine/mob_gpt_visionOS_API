@@ -1,0 +1,25 @@
+{
+  "node_server": {
+    "isUseHttps": true
+  , "port": 4035
+  , "sslPort": 3535
+  , "sslKey": "./ssl/_wildcard_deepfine_ai_SHA256WITHRSA.key"
+  , "sslCert": "./ssl/deepfine_ai_ssl.crt"
+  , "sslKeyTemp": "./fake-keys/privatekey.pem"
+  , "sslCertTemp": "./fake-keys/certificate.pem"
+  , "sslCa": ""
+  },
+  "db_server": {
+    "host": "192.168.1.214"
+  , "user": "deepfine"
+  , "password": "ckddjq0323"
+  , "port": "5432"
+  , "database": "deepfine"
+  , "idleTimeoutMillis": 10000
+  , "connectionTimeoutMillis": 30000
+  , "ssl": false
+  },
+  "crypto": {
+    "key": "vXnstJhF7jy2KXPNFqVpfQGdWFjFYBkj"
+  }
+}
