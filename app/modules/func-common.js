@@ -130,7 +130,7 @@ exports.getMulter = (fileGroup, rule) => {
             if(fileGroup == "mapping"){
                 fileName = file.originalname;
             }else{
-                fileName = Date.now().toString() + uuid4() + path.extname(file.originalname);
+                fileName = uuid4() + path.extname(file.originalname);
             }
 
             callback(null, fileName);

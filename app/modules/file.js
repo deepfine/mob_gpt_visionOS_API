@@ -16,6 +16,8 @@ exports.dbInsertFile = async (req, tagName, onSuccess, onError) => {
 			let insertFileCount = 0;
 
 			for (let thisFile of req.files[tagName]) {
+				console.log(`thisFile.filename >> ${thisFile.filename}`)
+
 				let fileNewModel = fileModel.newFileAllModel(req);
 
 				// tb_file 정보

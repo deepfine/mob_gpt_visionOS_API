@@ -7,7 +7,7 @@ const userModel = require('../models/userModel');
 exports.loginProc = async (req, res) => {
     let user = userModel.newModel(req);
 
-    const client = await psql.getConnection();
+    // const client = await psql.getConnection();
 
     let onError = (err) => {
         res.json(funcCmmn.getReturnMessage({isErr: true, code: 500, message:err.stack}));

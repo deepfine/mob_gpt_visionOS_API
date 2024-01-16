@@ -64,6 +64,7 @@
              , tb_file_dtl
          WHERE tb_file.id = #{fileId}
            AND tb_file.del_yn = 'N'
+           AND tb_file.id = tb_file_dtl.parent_id
     </select>
 </mapper>
 
