@@ -85,8 +85,16 @@ exports.chatMessage = async (req, res) => {
     let client = await psql.getConnection();
 
     try {
+        // 채팅방 여부 확인
+        const isValidChatRoom = await client.query(psql.getStatement(defaultMapper, 'isChatRoomCheck', chatMessage));
+
+        if ( isValidChatRoom.rows[0].cnt === '0' ) {
+            res.json(funcCmmn.getReturnMessage({ isErr: true, code: 500, message: "존재하지 않는 채팅방 입니다." }));
+            return;
+        }
+
         // 이전 데이터 조회
-        const previousData = await client.query(psql.getStatement(defaultMapper, 'getChatMessage', {chatId: "766df3af-2f09-49b5-8252-48cc9d72a48d"}));
+        const previousData = await client.query(psql.getStatement(defaultMapper, 'getChatMessage', {chatId: chatMessage.chatId}));
 
         if ( previousData ) {
             for (_d of previousData.rows) {
@@ -98,7 +106,9 @@ exports.chatMessage = async (req, res) => {
         const sendMessage = {role: "user", content: chatMessage.prompt};
         sendGptMessages.push(sendMessage);
 
-        // GPT 연동
+        // console.log(sendGptMessages);
+
+        // GPT API 호출
         const gptApiResponse = await callChatGPT(sendGptMessages);
 
         if (gptApiResponse.code !== 200) {
@@ -128,10 +138,8 @@ exports.chatMessage = async (req, res) => {
         }, (err) => {
             res.json(funcCmmn.getReturnMessage({ isErr: true, code: 500, message: "메세지 데이터 등록중 오류 발생" }));
         });
-
     } catch (err) {
         res.json(funcCmmn.getReturnMessage({ isErr: true, code: 500, message: "메세지 등록중 오류가 발생하였습니다." }));
-        return;
     } finally {
         client.release();
     }

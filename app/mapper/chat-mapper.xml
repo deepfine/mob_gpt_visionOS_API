@@ -52,6 +52,16 @@
         ]]>
     </select>
 
+    <!-- 채팅방 여부 확인 -->
+    <select id="isChatRoomCheck">
+        <![CDATA[
+        SELECT COUNT(1) AS cnt
+          FROM tb_chat
+         WHERE tb_chat.id = #{chatId}
+           AND tb_chat.del_yn = 'N'
+        ]]>
+    </select>
+
     <!-- 채팅방 생성 -->
     <select id="insertChat">
         <![CDATA[

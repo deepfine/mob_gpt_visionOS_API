@@ -4,7 +4,8 @@ const {Configuration, OpenAIApi} = require("openai");
 async function callChatGPT(sendGptMessages) {
     // GPT KEY 는 나중에 properties로 관리해야함!!!
     const configuration = new Configuration({
-       apiKey: "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"
+        apiKey: "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",
+        organization: "org-kqyxr55swOBXR6D77Pdzu1hR"
     });
 
     try {
