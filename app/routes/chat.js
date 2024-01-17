@@ -12,6 +12,11 @@ module.exports = (express) => {
     const chatModel = require('../models/chatModel');
     const chatSchema = chatModel.chatSchema;
 
+    /* 채팅 파트너 검색 */
+    router.get('/getPartnerSearch', validator.validate({
+
+    }), chatController.getPartnerSearch);
+
     /* 채팅 파트너 등록 */
     router.post('/insertChatPartners', validator.validate({
         targetUserKey: chatSchema.targetUserKey

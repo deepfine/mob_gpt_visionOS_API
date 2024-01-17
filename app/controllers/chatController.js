@@ -1,6 +1,63 @@
-const { callChatGPT, getGptKey } = require('../modules/chatgpt');
+const { callChatGPT, getGptKey, callImageGenerate } = require('../modules/chatgpt');
 const defaultMapper = 'chat';
 const chatModel = require('../models/chatModel');
+
+/**
+ * 채팅 파트너 검색
+ */
+exports.getPartnerSearch = async (req, res) => {
+    let client = await psql.getConnection();
+
+    try {
+        const prompt = "A girl";
+
+        // GPT KEY 데이터 조회
+        const gptKey = await getGptKey(client);
+
+        // GPT API 호출 데이터 만들기
+        const charactersInfo =
+            { charactersInfo: [
+                    {"name": "", "personality": "", "job": "", "hobby": "", "language": ""},
+                    {"name": "", "personality": "", "job": "", "hobby": "", "language": ""},
+                    {"name": "", "personality": "", "job": "", "hobby": "", "language": ""}
+                ]};
+
+        const contents = "Create three characters that match the title of " + prompt + " using the following JSON." + "\n" + JSON.stringify(charactersInfo);
+
+        // GPT API 호출 (병렬 처리)
+        let [gptImageApiResponse, gptApiResponse] =
+            await Promise.all([callImageGenerate(gptKey, prompt), callChatGPT(gptKey, [{role: "user", content: contents}])]);
+
+        if (gptImageApiResponse.code !== 200) {
+            res.json(funcCmmn.getReturnMessage({ isErr: true, code: 500, message: gptImageApiResponse.messageData }));
+            return;
+        }
+
+        const gptImageData = gptImageApiResponse.messageData.data.data;
+
+        if ( funcCmmn.isNull(gptImageData) ) {
+            res.json(funcCmmn.getReturnMessage({isErr: true, code: 500, message: "GPT 이미지 데이터 NULL"}));
+            return;
+        }
+
+        const getMessage = gptApiResponse.messageData.data.choices[0].message;
+
+        if ( funcCmmn.isNull(getMessage) ) {
+            res.json(funcCmmn.getReturnMessage({isErr: true, code: 500, message: "GPT 리턴 데이터 NULL"}));
+            return;
+        }
+
+        res.json(funcCmmn.getReturnMessage({resultData: {
+                users: getMessage.content,
+                images: gptImageData
+            }, resultCnt: 1}));
+
+    } catch (e) {
+        res.json(funcCmmn.getReturnMessage({ isErr: true, code: 500, message: "메세지 등록중 오류가 발생하였습니다." }));
+    } finally {
+        client.release();
+    }
+}
 
 /**
  * 채팅 파트너 목록 조회

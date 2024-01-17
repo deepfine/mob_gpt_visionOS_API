@@ -26,4 +26,27 @@ async function callChatGPT(keyData, sendGptMessages) {
     }
 }
 
-module.exports = { callChatGPT, getGptKey }
+async function callImageGenerate(keyData, prompt) {
+    // createImage
+    const configuration = new Configuration(keyData);
+
+    try {
+        const openai = new OpenAIApi(configuration);
+
+        const response = await openai.createImage({
+            model: "dall-e-2",
+            prompt: prompt,
+            size: "512x512",
+            response_format: "url",
+            n: 3
+        });
+
+        return {code: 200, messageData: response};
+
+        //return response.data.choices[0].message;
+    } catch (error) {
+        return {code: 500, messageData: `${error.message}`};
+    }
+}
+
+module.exports = { callChatGPT, getGptKey, callImageGenerate }
