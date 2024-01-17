@@ -52,6 +52,36 @@
         ]]>
     </select>
 
+    <!-- 채팅 룸 리스트 조회 -->
+    <select id="selectChatRoomList">
+        <![CDATA[
+        SELECT tb_chat_partner.id AS partner_id
+             , tb_chat_partner.name AS name
+             , tb_chat_partner.hobby AS hobby
+             , tb_chat_partner.personality AS personality
+             , tb_chat_partner.job AS job
+             , tb_chat_partner.language AS language
+             , tb_chat_partner.reg_date AS reg_date
+             , tb_file.id AS file_id
+             , tb_chat.id AS chat_id
+             , (SELECT tb_chat_msg.message
+                  FROM tb_chat_msg
+                 WHERE tb_chat.id = tb_chat_msg.chat_id
+                   AND tb_chat_msg.del_yn = 'N'
+                 ORDER BY tb_chat_msg.reg_dt DESC
+                 LIMIT 1) AS chat_last_message
+          FROM tb_user
+             , tb_chat_partner
+          LEFT OUTER JOIN tb_file ON tb_chat_partner.profile_file_id = tb_file.id
+          LEFT OUTER JOIN tb_file_dtl ON tb_file.id = tb_file_dtl.parent_id AND tb_file.del_yn = 'N'
+          INNER JOIN tb_chat ON tb_chat_partner.id = tb_chat.chat_partner_id AND tb_chat.del_yn = 'N'
+         WHERE tb_user.id = #{userId}
+           AND tb_user.id = tb_chat_partner.target_user_key
+           AND tb_chat_partner.del_yn = 'N'
+         ORDER BY tb_chat.reg_dt DESC
+        ]]>
+    </select>
+
     <!-- 채팅방 여부 확인 -->
     <select id="isChatRoomCheck">
         <![CDATA[

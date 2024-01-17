@@ -22,6 +22,11 @@ module.exports = (express) => {
 
     }), chatController.getChatPartners);
 
+    /* 채팅 리스트 조회 */
+    router.get('/chatRoomList', validator.validate({
+        userId: chatSchema.userId,
+    }), chatController.chatRoomList);
+
     /* 채팅 */
     router.get('/chatMessage', validator.validate({
         prompt: chatSchema.prompt,

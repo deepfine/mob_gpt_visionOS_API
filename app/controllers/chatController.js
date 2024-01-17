@@ -1,4 +1,4 @@
-const { callChatGPT } = require('../modules/chatgpt');
+const { callChatGPT, getGptKey } = require('../modules/chatgpt');
 const defaultMapper = 'chat';
 const chatModel = require('../models/chatModel');
 
@@ -68,6 +68,29 @@ exports.insertChatPartners = async (req, res) => {
 }
 
 /**
+ * 채팅 룸 리스트 조회
+ */
+exports.chatRoomList = async (req, res) => {
+    let chat = chatModel.newChatMessageModel(req);
+
+    let onError = (err) => {
+        res.json(funcCmmn.getReturnMessage({isErr: true, code: 500, message:err.stack}));
+        console.log(err);
+    };
+
+    let onSuccess = (result) => {
+        let resultData = result;
+        if(result == null){
+            res.json(funcCmmn.getReturnMessage({isErr: true, code: 500, message: 'no data'}));
+        } else{
+            res.json(funcCmmn.getReturnMessage({resultData: resultData, resultCnt: resultData.length}));
+        }
+    }
+
+    psql.select(defaultMapper, 'selectChatRoomList', chat, onSuccess, onError);
+}
+
+/**
  * 메세지 데이터 만들기
  */
 function makeChatMessageData(chatId, message, date) {
@@ -108,8 +131,11 @@ exports.chatMessage = async (req, res) => {
 
         // console.log(sendGptMessages);
 
+        // GPT KEY 데이터 조회
+        const gptKey = await getGptKey(client);
+
         // GPT API 호출
-        const gptApiResponse = await callChatGPT(sendGptMessages);
+        const gptApiResponse = await callChatGPT(gptKey, sendGptMessages);
 
         if (gptApiResponse.code !== 200) {
             res.json(funcCmmn.getReturnMessage({ isErr: true, code: 500, message: gptApiResponse.messageData }));

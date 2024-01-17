@@ -1,12 +1,14 @@
 require('dotenv').config();
 const {Configuration, OpenAIApi} = require("openai");
+const defaultMapper = 'key';
 
-async function callChatGPT(sendGptMessages) {
-    // GPT KEY 는 나중에 properties로 관리해야함!!!
-    const configuration = new Configuration({
-        apiKey: "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",
-        organization: "org-kqyxr55swOBXR6D77Pdzu1hR"
-    });
+async function getGptKey(dbConn) {
+    const keyData = await dbConn.query(psql.getStatement(defaultMapper, 'getKey', {type: "ChatGPT"}));
+    return keyData.rows[0].configuration;
+}
+
+async function callChatGPT(keyData, sendGptMessages) {
+    const configuration = new Configuration(keyData);
 
     try {
         const openai = new OpenAIApi(configuration);
@@ -24,4 +26,4 @@ async function callChatGPT(sendGptMessages) {
     }
 }
 
-module.exports = { callChatGPT }
+module.exports = { callChatGPT, getGptKey }
