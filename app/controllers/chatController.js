@@ -4,7 +4,6 @@ const chatModel = require('../models/chatModel');
 
 /**
  * 채팅 파트너 목록 조회
- */
 exports.getChatPartners = async (req, res) => {
     let chat = chatModel.newChatPartnerModel(req);
 
@@ -24,6 +23,7 @@ exports.getChatPartners = async (req, res) => {
 
     psql.select(defaultMapper, 'selectPartners', chat, onSuccess, onError);
 }
+*/
 
 /**
  * 채팅 파트너 등록 및 채팅 시작
@@ -91,6 +91,29 @@ exports.chatRoomList = async (req, res) => {
 }
 
 /**
+ * 채팅방 대화 리스트 조회
+ */
+exports.chatList = async (req, res) => {
+    let chat = chatModel.newChatMessageModel(req);
+
+    let onError = (err) => {
+        res.json(funcCmmn.getReturnMessage({isErr: true, code: 500, message:err.stack}));
+        console.log(err);
+    };
+
+    let onSuccess = (result) => {
+        let resultData = result;
+        if (result == null){
+            res.json(funcCmmn.getReturnMessage({isErr: true, code: 500, message: 'no data'}));
+        } else{
+            res.json(funcCmmn.getReturnMessage({resultData: resultData, resultCnt: resultData.length}));
+        }
+    }
+
+    psql.select(defaultMapper, 'selectChatList', chat, onSuccess, onError);
+}
+
+/**
  * 메세지 데이터 만들기
  */
 function makeChatMessageData(chatId, message, date) {
@@ -102,7 +125,7 @@ function makeChatMessageData(chatId, message, date) {
  */
 exports.chatMessage = async (req, res) => {
     const chatMessage = chatModel.newChatMessageModel(req);
-    const sendGptMessages = [];
+    let sendGptMessages = [];
     const sendMessageTime = funcCmmn.getTimestamp();
 
     let client = await psql.getConnection();
@@ -117,19 +140,31 @@ exports.chatMessage = async (req, res) => {
         }
 
         // 이전 데이터 조회
-        const previousData = await client.query(psql.getStatement(defaultMapper, 'getChatMessage', {chatId: chatMessage.chatId}));
+        const previousData = await client.query(psql.getStatement(defaultMapper, 'getPreviousConversation', {chatId: chatMessage.chatId}));
 
         if ( previousData ) {
-            for (_d of previousData.rows) {
-                sendGptMessages.push(_d.message);
-            }
+            sendGptMessages = previousData.rows[0].messages;
+        }
+
+        // Partner 성격, 이름 등 조회
+        const chatPartnerData = await client.query(psql.getStatement(defaultMapper, 'selectPartners', {chatId: chatMessage.chatId}));
+
+        if ( chatPartnerData ) {
+            // GPT API 사용 전 파트너에 대한 정보를 같이 Message로 넣어준다
+            sendGptMessages.push({
+                role: "system",
+                content: "Your name is " + chatPartnerData.rows[0].name + " \n" +
+                    "Your personality is " + chatPartnerData.rows[0].personality + " \n" +
+                    "Your job is " + chatPartnerData.rows[0].job + " \n" +
+                    "Your hobby is " + chatPartnerData.rows[0].hobby + " \n" +
+                    "You have to answer by making a tone that fits this information. " + " \n" +
+                    "And you must answer using " + chatPartnerData.rows[0].language
+            });
         }
 
         // GPT API 사용 될 메세지 세팅
         const sendMessage = {role: "user", content: chatMessage.prompt};
         sendGptMessages.push(sendMessage);
-
-        // console.log(sendGptMessages);
 
         // GPT KEY 데이터 조회
         const gptKey = await getGptKey(client);

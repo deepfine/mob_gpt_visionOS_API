@@ -54,6 +54,20 @@ exports.getUUID = () => {
 };
 
 /**
+ * UUID 값 체크
+ * @param input
+ * @returns {*|boolean}
+ */
+exports.isValidUUID = (input) => {
+    try {
+        const regexExp = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/gi;
+        return regexExp.test(input);
+    } catch (error) {
+        return false;
+    }
+}
+
+/**
  * isNull
  * null 여부 조회
  * @param obj

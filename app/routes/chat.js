@@ -17,15 +17,21 @@ module.exports = (express) => {
         targetUserKey: chatSchema.targetUserKey
     }), chatController.insertChatPartners);
 
-    /* 채팅 파트너 조회 */
+    /* 채팅 파트너 조회
     router.get('/getChatPartners', validator.validate({
 
     }), chatController.getChatPartners);
+    */
 
     /* 채팅 리스트 조회 */
     router.get('/chatRoomList', validator.validate({
         userId: chatSchema.userId,
     }), chatController.chatRoomList);
+
+    /* 채팅방 대화 리스트 조회 */
+    router.get('/chatList', validator.validate({
+        chatId: chatSchema.chatId,
+    }), chatController.chatList);
 
     /* 채팅 */
     router.get('/chatMessage', validator.validate({

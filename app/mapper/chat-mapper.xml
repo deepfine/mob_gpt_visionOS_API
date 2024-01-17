@@ -31,24 +31,15 @@
     <!-- 채팅 파트너 조회 -->
     <select id="selectPartners">
         <![CDATA[
-        SELECT tb_chat_partner.id AS partner_id
-             , tb_chat_partner.name AS name
-             , tb_chat_partner.hobby AS hobby
-             , tb_chat_partner.personality AS personality
-             , tb_chat_partner.job AS job
-             , tb_chat_partner.language AS language
-             , tb_chat_partner.reg_date AS reg_date
-             , tb_file.id AS file_id
-             , tb_file_dtl.id AS file_dtl_id
-             , tb_file_dtl.original_name AS file_original_name
-             , tb_file_dtl.mimetype AS file_mime_type
-             , tb_file_dtl.file_name AS file_name
-             , tb_file_dtl.path AS file_path
-             , tb_file_dtl.size AS file_size
-          FROM tb_chat_partner
-          LEFT OUTER JOIN tb_file ON tb_chat_partner.profile_file_id = tb_file.id AND tb_file.del_yn = 'N'
-          LEFT OUTER JOIN tb_file_dtl ON tb_file.id = tb_file_dtl.parent_id
-         WHERE target_user_key = #{targetUserKey}
+        SELECT COALESCE(tb_chat_partner.name, '') AS name
+             , COALESCE(tb_chat_partner.hobby, '') AS hobby
+             , COALESCE(tb_chat_partner.personality, '') AS personality
+             , COALESCE(tb_chat_partner.job, '') AS job
+             , COALESCE(tb_chat_partner.language, '') AS language
+          FROM tb_chat
+             , tb_chat_partner
+         WHERE tb_chat.id = #{chatId}
+           AND tb_chat.chat_partner_id = tb_chat_partner.id
         ]]>
     </select>
 
@@ -79,6 +70,20 @@
            AND tb_user.id = tb_chat_partner.target_user_key
            AND tb_chat_partner.del_yn = 'N'
          ORDER BY tb_chat.reg_dt DESC
+        ]]>
+    </select>
+
+    <!-- 채팅방 대화 리스트 조회 -->
+    <select id="selectChatList">
+        <![CDATA[
+        SELECT tb_chat_msg.message
+             , tb_chat_msg.reg_dt
+          FROM tb_chat
+             , tb_chat_msg
+         WHERE tb_chat.id = #{chatId}
+           AND tb_chat.id = tb_chat_msg.chat_id
+           AND tb_chat_msg.del_yn = 'N'
+         ORDER BY tb_chat_msg.reg_dt ASC
         ]]>
     </select>
 
@@ -138,13 +143,13 @@
         RETURNING *
     </update>
 
-    <!-- 채팅 메세지 조회 -->
-    <select id="getChatMessage">
+    <!-- 이전 대화 내용 조회 -->
+    <select id="getPreviousConversation">
         <![CDATA[
-        SELECT *
+        SELECT JSON_AGG(message ORDER BY reg_dt ASC) AS messages
           FROM tb_chat_msg
          WHERE chat_id = #{chatId}
-         ORDER BY reg_dt ASC
+           AND del_yn = 'N'
         ]]>
     </select>
 

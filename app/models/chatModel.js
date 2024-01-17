@@ -20,6 +20,7 @@ let CHAT_PARTNER = {
 }
 
 let CHAT_MESSAGE = {
+    partnerId: null,
     userId: null,
     chatId: null,
     name: null,
