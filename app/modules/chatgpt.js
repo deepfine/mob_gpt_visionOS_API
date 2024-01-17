@@ -1,10 +1,10 @@
 require('dotenv').config();
 const {Configuration, OpenAIApi} = require("openai");
 
-async function callChatGPT(prompt) {
+async function callChatGPT(sendGptMessages) {
     // GPT KEY 는 나중에 properties로 관리해야함!!!
     const configuration = new Configuration({
-       apiKey: "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"
+       apiKey: "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"
     });
 
     try {
@@ -12,13 +12,14 @@ async function callChatGPT(prompt) {
 
         const response = await openai.createChatCompletion({
             model: "gpt-3.5-turbo",
-            messages: [{role: "user", content: prompt}],
+            messages: sendGptMessages,
         });
 
-        return response.data.choices[0].message;
+        return {code: 200, messageData: response};
+
+        //return response.data.choices[0].message;
     } catch (error) {
-        console.log(`ERROR >> ${error.message}`)
-        return null;
+        return {code: 500, messageData: `${error.message}`};
     }
 }
 

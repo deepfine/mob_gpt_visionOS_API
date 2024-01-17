@@ -22,10 +22,12 @@ module.exports = (express) => {
 
     }), chatController.getChatPartners);
 
-    /* ChatGPT API */
-    router.get('/chatGpt', validator.validate({
-
-    }), chatController.chatGpt);
+    /* 채팅 */
+    router.get('/chatMessage', validator.validate({
+        prompt: chatSchema.prompt,
+        chatId: chatSchema.chatId,
+        userId: chatSchema.userId,
+    }), chatController.chatMessage);
 
     return router;
 }

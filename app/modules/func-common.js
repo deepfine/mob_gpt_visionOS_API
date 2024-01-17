@@ -5,6 +5,15 @@ const uuid4 = require("uuid4");
 moment.locale('ko');
 
 /**
+ * getTimestamp
+ * timestamp 조회
+ * @returns timestamp
+ */
+exports.getTimestamp = () => {
+    return Date.now().toString();
+};
+
+/**
  * 비동기 통신(AJAX)의 리턴 메시지 format
  * @param isErr: boolean
  * @param code: int

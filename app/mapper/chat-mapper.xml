@@ -3,7 +3,7 @@
 
 <mapper namespace="chat">
     <!-- 채팅 파트너 등록 -->
-    <update id="insertChatPartners">
+    <select id="insertChatPartners">
         <![CDATA[
         INSERT INTO tb_chat_partner (
               target_user_key
@@ -24,8 +24,9 @@
             , 'N'
             , #{profileFileId}
         )
+        RETURNING id
         ]]>
-    </update>
+    </select>
 
     <!-- 채팅 파트너 조회 -->
     <select id="selectPartners">
@@ -44,10 +45,66 @@
              , tb_file_dtl.file_name AS file_name
              , tb_file_dtl.path AS file_path
              , tb_file_dtl.size AS file_size
-        FROM tb_chat_partner
-        LEFT OUTER JOIN tb_file ON tb_chat_partner.profile_file_id = tb_file.id AND tb_file.del_yn = 'N'
-        LEFT OUTER JOIN tb_file_dtl ON tb_file.id = tb_file_dtl.parent_id
-        WHERE target_user_key = #{targetUserKey}
+          FROM tb_chat_partner
+          LEFT OUTER JOIN tb_file ON tb_chat_partner.profile_file_id = tb_file.id AND tb_file.del_yn = 'N'
+          LEFT OUTER JOIN tb_file_dtl ON tb_file.id = tb_file_dtl.parent_id
+         WHERE target_user_key = #{targetUserKey}
+        ]]>
+    </select>
+
+    <!-- 채팅방 생성 -->
+    <select id="insertChat">
+        <![CDATA[
+        WITH insert_chat_data AS (
+            INSERT INTO tb_chat(chat_partner_id, reg_id)
+            VALUES (#{chatPartnerId}, #{regId})
+            RETURNING *
+        )
+        SELECT insert_chat_data.id AS chat_id
+             , insert_chat_data.chat_partner_id AS chat_partner_id
+             , insert_chat_data.reg_id AS reg_id
+             , insert_chat_data.reg_dt AS chat_reg_dt
+             , tb_chat_partner.name AS name
+             , tb_chat_partner.hobby AS hobby
+             , tb_chat_partner.personality AS personality
+             , tb_chat_partner.profile_file_id AS  profile_file_id
+             , tb_chat_partner.job AS job
+             , tb_chat_partner.language AS language
+          FROM insert_chat_data
+             , tb_chat_partner
+         WHERE insert_chat_data.chat_partner_id = tb_chat_partner.id
+           AND tb_chat_partner.del_yn = 'N'
+        ]]>
+    </select>
+
+    <!-- 채팅 내용 저장 -->
+    <update id="insertChatMessage">
+        <![CDATA[
+        INSERT INTO tb_chat_msg (
+            chat_id
+          , message
+          , reg_dt
+        )
+        ]]>
+        <foreach collection="chatMessages" item="msg" open=" values " separator=",">
+            <![CDATA[
+				(
+					#{msg.chatId}::uuid
+                  , #{msg.message}::json
+                  , to_timestamp(#{msg.date}::BIGINT / 1000)::timestamp
+				)
+			]]>
+        </foreach>
+        RETURNING *
+    </update>
+
+    <!-- 채팅 메세지 조회 -->
+    <select id="getChatMessage">
+        <![CDATA[
+        SELECT *
+          FROM tb_chat_msg
+         WHERE chat_id = #{chatId}
+         ORDER BY reg_dt ASC
         ]]>
     </select>
 
