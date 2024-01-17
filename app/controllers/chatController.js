@@ -6,29 +6,29 @@ const chatModel = require('../models/chatModel');
  * 채팅 파트너 검색
  */
 exports.getPartnerSearch = async (req, res) => {
+    let chat = chatModel.newChatMessageModel(req);
+
     let client = await psql.getConnection();
 
     try {
-        const prompt = "A girl";
-
         // GPT KEY 데이터 조회
         const gptKey = await getGptKey(client);
 
         // GPT API 호출 데이터 만들기
         const charactersInfo =
             { charactersInfo: [
-                    {"name": "", "personality": "", "job": "", "hobby": "", "language": ""},
-                    {"name": "", "personality": "", "job": "", "hobby": "", "language": ""},
-                    {"name": "", "personality": "", "job": "", "hobby": "", "language": ""}
-                ]};
+                {"name": "", "personality": "", "job": "", "hobby": "", "language": ""},
+                {"name": "", "personality": "", "job": "", "hobby": "", "language": ""},
+                {"name": "", "personality": "", "job": "", "hobby": "", "language": ""}]
+            };
 
-        const contents = "Create three characters that match the title of " + prompt + " using the following JSON." + "\n" + JSON.stringify(charactersInfo);
+        const contents = "Create three characters that match the title of " + chat.prompt + " using the following JSON." + "\n" + JSON.stringify(charactersInfo);
 
         // GPT API 호출 (병렬 처리)
-        let [gptImageApiResponse, gptApiResponse] =
-            await Promise.all([callImageGenerate(gptKey, prompt), callChatGPT(gptKey, [{role: "user", content: contents}])]);
+        let [ gptImageApiResponse, gptApiResponse] =
+            await Promise.all([callImageGenerate(gptKey, chat.prompt), callChatGPT(gptKey, [{role: "user", content: contents}])]);
 
-        if (gptImageApiResponse.code !== 200) {
+        if ( gptImageApiResponse.code !== 200 ) {
             res.json(funcCmmn.getReturnMessage({ isErr: true, code: 500, message: gptImageApiResponse.messageData }));
             return;
         }
@@ -58,29 +58,6 @@ exports.getPartnerSearch = async (req, res) => {
         client.release();
     }
 }
-
-/**
- * 채팅 파트너 목록 조회
-exports.getChatPartners = async (req, res) => {
-    let chat = chatModel.newChatPartnerModel(req);
-
-    let onError = (err) => {
-        res.json(funcCmmn.getReturnMessage({isErr: true, code: 500, message:err.stack}));
-        console.log(err);
-    };
-
-    let onSuccess = (result) => {
-        let resultData = result;
-        if(result == null){
-            res.json(funcCmmn.getReturnMessage({isErr: true, code: 500, message: 'no data'}));
-        } else{
-            res.json(funcCmmn.getReturnMessage({resultData: resultData, resultCnt: resultData.length}));
-        }
-    }
-
-    psql.select(defaultMapper, 'selectPartners', chat, onSuccess, onError);
-}
-*/
 
 /**
  * 채팅 파트너 등록 및 채팅 시작
