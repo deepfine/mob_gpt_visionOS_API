@@ -19,8 +19,6 @@ async function callChatGPT(keyData, sendGptMessages) {
         });
 
         return {code: 200, messageData: response};
-
-        //return response.data.choices[0].message;
     } catch (error) {
         return {code: 500, messageData: `${error.message}`};
     }

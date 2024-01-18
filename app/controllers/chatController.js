@@ -148,6 +148,29 @@ exports.chatList = async (req, res) => {
 }
 
 /**
+ * 채팅방 삭제
+ */
+exports.deleteChat = async (req, res) => {
+    let chat = chatModel.newChatMessageModel(req);
+
+    let onError = (err) => {
+        res.json(funcCmmn.getReturnMessage({isErr: true, code: 500, message:err.stack}));
+        console.log(err);
+    };
+
+    let onSuccess = (result) => {
+        let resultData = result;
+        if (result == null){
+            res.json(funcCmmn.getReturnMessage({isErr: true, code: 500, message: 'no data'}));
+        } else{
+            res.json(funcCmmn.getReturnMessage({}));
+        }
+    }
+
+    psql.update(defaultMapper, 'deleteChat', chat, onSuccess, onError);
+}
+
+/**
  * 메세지 데이터 만들기
  */
 function makeChatMessageData(chatId, message, date) {
@@ -176,7 +199,7 @@ exports.chatMessage = async (req, res) => {
         // 이전 데이터 조회
         const previousData = await client.query(psql.getStatement(defaultMapper, 'getPreviousConversation', {chatId: chatMessage.chatId}));
 
-        if ( previousData ) {
+        if ( previousData && previousData.rows[0].messages ) {
             sendGptMessages = previousData.rows[0].messages;
         }
 
@@ -185,7 +208,7 @@ exports.chatMessage = async (req, res) => {
 
         if ( chatPartnerData ) {
             // GPT API 사용 전 파트너에 대한 정보를 같이 Message로 넣어준다
-            sendGptMessages.push({
+            sendGptMessages.unshift({
                 role: "system",
                 content: "Your name is " + chatPartnerData.rows[0].name + " \n" +
                     "Your personality is " + chatPartnerData.rows[0].personality + " \n" +

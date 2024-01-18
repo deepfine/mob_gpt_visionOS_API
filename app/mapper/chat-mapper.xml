@@ -153,4 +153,14 @@
         ]]>
     </select>
 
+    <!-- 채팅방 삭제 -->
+    <update id="deleteChat">
+        <![CDATA[
+        UPDATE tb_chat
+           SET del_yn = 'Y'
+         WHERE id = #{chatId}
+           AND reg_id = #{userId}
+        ]]>
+    </update>
+
 </mapper>

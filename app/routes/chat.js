@@ -22,11 +22,11 @@ module.exports = (express) => {
         targetUserKey: chatSchema.targetUserKey
     }), chatController.insertChatPartners);
 
-    /* 채팅 파트너 조회
-    router.get('/getChatPartners', validator.validate({
-
-    }), chatController.getChatPartners);
-    */
+    /* 채팅방 삭제 */
+    router.post('/deleteChat', validator.validate({
+        chatId: chatSchema.chatId,
+        userId: chatSchema.userId,
+    }), chatController.deleteChat);
 
     /* 채팅 리스트 조회 */
     router.get('/chatRoomList', validator.validate({
