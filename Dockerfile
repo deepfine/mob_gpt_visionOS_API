@@ -17,10 +17,3 @@ COPY ./ ./
 
 # 컨테이너가 실행될 때 1번만 수행되는 {시작 명령어} 자리에 들어갈 커맨드
 CMD ["node", "index.js"]
-
-# wait-for-it.sh
-# COPY wait-for-it.sh ./
-# RUN chmod +x wait-for-it.sh
-
-# Docker Demon Port Mapping
-# EXPOSE 3000
