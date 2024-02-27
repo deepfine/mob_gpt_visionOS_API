@@ -3,6 +3,8 @@ FROM node:16.15.1
 # Create Directory for the Container
 WORKDIR /app
 
+ENV PATH /app/node_modules/.bin:$PATH
+
 # Only copy the package.json file to work directory
 # COPY package*.json ./
 RUN npm install
