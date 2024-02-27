@@ -8,8 +8,8 @@ services:
     volumes:
       - shared-data:/home/deepfine/data/vision_pro
     ports:
-      - "3000:3000"
+      - "3535:3535"
     command:
-      - npm run local
+      - node index.js
 volumes:
   shared-data:

@@ -16,4 +16,4 @@ RUN npm install
 COPY ./ ./
 
 # 컨테이너가 실행될 때 1번만 수행되는 {시작 명령어} 자리에 들어갈 커맨드
-CMD ["node", "index.js"]
+# CMD ["node", "index.js"]
