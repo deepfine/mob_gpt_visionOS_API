@@ -1,10 +1,5 @@
 FROM node:16.15.1
 
-# Set the timezone in docker
-RUN apk --no-cache add tzdata && \
-        cp /usr/share/zoneinfo/Asia/Seoul /etc/localtime && \
-        echo "Asia/Seoul" > /etc/timezone
-
 # Create Directory for the Container
 WORKDIR /app
 
