@@ -1,4 +1,5 @@
-version: '1'
+# 우분투 20.04 버전에서는 지원 안함
+#version: '1'
 
 services:
   vision_pro:
@@ -9,7 +10,5 @@ services:
       - shared-data:/home/deepfine/data/vision_pro
     ports:
       - "3535:3535"
-    command:
-      - node index.js
 volumes:
   shared-data:
