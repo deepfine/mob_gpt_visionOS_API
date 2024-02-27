@@ -2,7 +2,19 @@
 #version: '1'
 
 services:
-  vision_pro:
+  postgre_db:
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: deepfine
+      POSTGRES_PASSWORD: ckddjq0323
+      POSTGRES_INITDB_ARGS: --encoding=UTF-8
+      TZ: "Asia/Seoul"
+    volumes:
+      - shared-data:/postgresql
+  vision_pro_api:
     build:
       context: /home/deepfine/data/docker/mob_gpt_visionOS_API
       dockerfile: /home/deepfine/data/docker/mob_gpt_visionOS_API/Dockerfile
@@ -10,5 +22,8 @@ services:
       - shared-data:/upload
     ports:
       - "3535:3535"
+    command:
+      - node
+      - index.js
 volumes:
   shared-data:

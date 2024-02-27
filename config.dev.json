@@ -10,7 +10,7 @@
   , "sslCa": ""
   },
   "db_server": {
-    "host": "192.168.1.214"
+    "host": "postgre_db"
   , "user": "deepfine"
   , "password": "ckddjq0323"
   , "port": "5432"
