@@ -7,7 +7,7 @@ services:
       context: /home/deepfine/data/docker/mob_gpt_visionOS_API
       dockerfile: /home/deepfine/data/docker/mob_gpt_visionOS_API/Dockerfile
     volumes:
-      - shared-data:/home/deepfine/data/vision_pro
+      - shared-data:/upload
     ports:
       - "3535:3535"
 volumes:
