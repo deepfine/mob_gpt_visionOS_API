@@ -1,0 +1,13 @@
+version: '1'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./DockerFile
+    ports:
+      - "3000:3000"
+    command:
+      - npm run local
+    volumes:
+      - ./:/app/
