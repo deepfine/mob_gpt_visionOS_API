@@ -3,7 +3,7 @@ version: '1'
 services:
   vision_pro:
     build:
-      context: .
+      context: /home/deepfine/data/docker/mob_gpt_visionOS_API
       dockerfile: /home/deepfine/data/docker/mob_gpt_visionOS_API/Dockerfile
     volumes:
       - shared-data:/home/deepfine/data/vision_pro
