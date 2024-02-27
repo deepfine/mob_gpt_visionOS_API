@@ -15,6 +15,7 @@ services:
       TZ: "Asia/Seoul"
     volumes:
       - shared-data:/postgresql
+      - /home/deepfine/data/docker/:/docker-entrypoint-initdb.d/
   vision_pro_api:
     build:
       context: /home/deepfine/data/docker/mob_gpt_visionOS_API
